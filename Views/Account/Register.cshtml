@@ -1,0 +1,62 @@
+﻿@*モデル宣言:「このView(画面)は、RegisterViewModel型のデータを受け取ることを前提にしています」という型の宣言*@
+@model TaskManager.Models.ViewModels.RegisterViewModel
+
+@*:複数行のC#コードを書くためのブロック(コードブロック)*@
+@*「このページのタイトルは"ユーザー登録"です」という情報をセット*@
+@{
+	ViewData["Title"] = "ユーザー登録";
+}
+
+<h2>ユーザー登録</h2>
+
+<div class="row">
+	<div class="col-md-6">
+		@*asp-action:Tag Helper　コントローラー名やアクション名の変更に自動で追従するためURLを手打ちしなくて済む*@
+		<form asp-action="Register" method="post">
+			@*バリデーションサマリー:個別の項目に紐づかない、全体的なエラーメッセージをまとめて表示*@
+			@*"ModelOnly"という値は、「モデル全体レベルのエラーだけを表示し、個別項目のエラーはここには表示しない(それぞれの入力欄の下に表示する)」という設定*@
+			@*今回ModelOnlyを選んでいるのは、「個別のエラーは各入力欄の下に、全体的なエラーだけはここに」という役割分担をさせたいため(Allではすべてのエラーが対象になる)*@
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+			@*mb-3は「margin-bottom: 3(下方向の余白)」という意味*@
+			<div class="form-group mb-3">
+				<label asp-for="Name" class="form-label"></label>@*Model.Name(コントローラーから渡されたRegisterViewModelのNameプロパティ)に対応するラベルを、自動生成*@
+				<input asp-for="Name" class="form-control" />@*入力欄の設定*@
+				<span asp-validation-for="Name" class="text-danger"></span>@*Nameプロパティに関するバリデーションエラーがあれば、ここに表示するという設定(バリデーションサマリーとの役割分担)*@
+			</div>
+
+			<div class="form-group mb-3">
+				<label asp-for="Email" class="form-label"></label>
+				<input asp-for="Email" class="form-control" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+
+			<div class="form-group mb-3">
+				<label asp-for="Password" class="form-label"></label>
+				<input asp-for="Password" class="form-control" />
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+
+			<div class="form-group mb-3">
+				<label asp-for="ConfirmPassword" class="form-label"></label>
+				<input asp-for="ConfirmPassword" class="form-control" />
+				<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+			</div>
+
+			<button type="submit" class="btn btn-primary">登録</button>
+		</form>
+
+		<div class="mt-3">
+			<a asp-action="Login">既にアカウントをお持ちの方はこちら</a>
+		</div>
+	</div>
+</div>
+
+@*JavaScriptを差し込む場所の用意*@
+@section Scripts {
+	@{
+		@*jQueryを使ったクライアントサイド(ブラウザ上で、サーバーに送信する前に)バリデーションを有効にするための部品(Partial View)*@
+		@*「必須項目が空のままボタンを押す」といった単純なミスを、サーバーに送信する前に、ブラウザ側で即座にエラー表示できるようになる*@
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
