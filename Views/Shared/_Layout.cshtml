@@ -27,6 +27,30 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @*未ログインの状態でもUser.Identity自体はnullにならず、「空の(認証されていない)Identity」が入っている。*@
+                        @*そのため、User.Identity.IsAuthenticatedで明確に「本当にログイン済みか」を判定する必要がある*@
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)// ログイン時にSignInAsyncで渡したClaimsPrincipalが、以降のリクエストのたびにUserプロパティとして自動的に取り出せる
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text text-dark me-3">@User.Identity.Name さん</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link text-dark" style="border:none;">ログアウト</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">ログイン</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">新規登録</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
