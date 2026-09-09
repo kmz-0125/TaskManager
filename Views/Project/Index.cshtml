@@ -37,9 +37,9 @@ else
 					<td>@project.TaskCount</td>
 					<td>@project.CreatedAt.ToString("yyyy/MM/dd")</td>
 					<td>
-						@*asp-route-id:URLの一部としてパラメータ(ID)を渡す必要がある時に用いる*@
-						@*例えばproject.Idが3だった場合、以下のようなURLが自動生成される*@
-						@*/Project/Edit/3*@
+						@*asp-route-id:URLの一部としてパラメータ(ID)を渡す必要がある時に用いる
+						例えばproject.Idが3だった場合、以下のようなURLが自動生成される
+						/Project/Edit/3 *@
 						<a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-sm btn-secondary">編集</a>
 						<a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-sm btn-danger">削除</a>
 					</td>
