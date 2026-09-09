@@ -150,5 +150,52 @@ namespace TaskManager.Controllers
 
             return RedirectToAction("Index");
         }
+        // GET: /Project/Delete/5
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var project = await _context.ProjectItems
+                .Include(p => p.Tasks)// プロジェクトに関連するタスクも同時に読み込む
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProjectViewModel
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                CreatedAt = project.CreatedAt,
+                TaskCount = project.Tasks.Count
+            };
+
+            return View(model);
+        }
+
+        // POST: /Project/Delete/5
+        [HttpPost, ActionName("Delete")]// C#上のメソッド名はDeleteConfirmed、ASP.NET Core MVCのルーティング上はDeleteという名前として扱うための指示
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var project = await _context.ProjectItems
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            _context.ProjectItems.Remove(project);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
     }
 }

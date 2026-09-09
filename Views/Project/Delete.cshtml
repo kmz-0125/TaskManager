@@ -1,0 +1,28 @@
+﻿@model TaskManager.Models.ViewModels.ProjectViewModel
+
+@{
+    ViewData["Title"] = "プロジェクト削除の確認";
+}
+
+<h2>プロジェクト削除の確認</h2>
+
+<div class="alert alert-warning">
+    このプロジェクトを削除すると、紐づく@(Model.TaskCount)件のタスクもすべて削除されます。この操作は取り消せません。
+</div>
+
+@*値を変更させたくない(表示するだけ)**ため、<input>ではなく<dl>を使っている*@
+<dl class="row">
+    <dt class="col-sm-2">プロジェクト名</dt>
+    <dd class="col-sm-10">@Model.Name</dd>
+
+    <dt class="col-sm-2">説明</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+
+    <dt class="col-sm-2">作成日</dt>
+    <dd class="col-sm-10">@Model.CreatedAt.ToString("yyyy/MM/dd")</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">削除する</button>
+    <a asp-action="Index" class="btn btn-secondary">キャンセル</a>
+</form>
