@@ -5,15 +5,25 @@ namespace TaskManager.Models
 {
     public enum TaskStatus
     {
+        [Display(Name = "未着手")]
         NotStarted,
+
+        [Display(Name = "進行中")]
         InProgress,
+
+        [Display(Name = "完了")]
         Completed
     }
 
     public enum TaskPriority
     {
+        [Display(Name = "低")]
         Low,
+
+        [Display(Name = "中")]
         Medium,
+
+        [Display(Name = "高")]
         High
     }
 

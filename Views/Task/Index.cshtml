@@ -1,4 +1,5 @@
 ﻿@model List<TaskManager.Models.ViewModels.TaskViewModel>
+@using TaskManager.Extensions
 
 @{
 	ViewData["Title"] = "タスク一覧";
@@ -32,8 +33,8 @@ else
 			{
 				<tr>
 					<td>@task.Title</td>
-					<td>@task.Status</td>
-					<td>@task.Priority</td>
+					<td>@task.Status.GetDisplayName()</td>
+					<td>@task.Priority.GetDisplayName()</td>
 					@*DueDateが設定されている場合 → "2026/09/15"と表示 DueDateが設定されていない場合(null) → "未設定"と表示*@
 					<td>@(task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</td>
 					<td>
