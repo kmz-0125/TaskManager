@@ -1,0 +1,47 @@
+﻿@model List<TaskManager.Models.ViewModels.TaskViewModel>
+
+@{
+	ViewData["Title"] = "タスク一覧";
+}
+
+<h2>@ViewBag.ProjectName のタスク一覧</h2>
+
+<p>
+	<a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-primary">新規タスク作成</a>
+	<a asp-controller="Project" asp-action="Index" class="btn btn-secondary">プロジェクト一覧に戻る</a>
+</p>
+
+@if (!Model.Any())
+{
+	<p>まだタスクがありません。</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>タスク名</th>
+				<th>ステータス</th>
+				<th>優先度</th>
+				<th>期限</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var task in Model)
+			{
+				<tr>
+					<td>@task.Title</td>
+					<td>@task.Status</td>
+					<td>@task.Priority</td>
+					@*DueDateが設定されている場合 → "2026/09/15"と表示 DueDateが設定されていない場合(null) → "未設定"と表示*@
+					<td>@(task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</td>
+					<td>
+						<a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-secondary">編集</a>
+						<a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">削除</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

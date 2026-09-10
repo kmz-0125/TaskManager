@@ -1,0 +1,55 @@
+﻿@model TaskManager.Models.ViewModels.TaskViewModel
+
+@{
+    ViewData["Title"] = "タスク作成";
+}
+
+<h2>@Model.ProjectName にタスクを作成</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <input type="hidden" asp-for="ProjectId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Status" class="form-label"></label>
+                @*指定したEnum型(TaskStatus)の全メンバーを読み取り、プルダウンメニューの選択肢リストを自動生成するメソッド*@
+                @*asp-itemsは<select>タグ専用のTag Helperで、「この<select>の中の選択肢を、指定したリストから自動生成してください」という指定*@
+                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<TaskManager.Models.TaskStatus>()"></select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Priority" class="form-label"></label>
+                <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<TaskManager.Models.TaskPriority>()"></select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DueDate" class="form-label"></label>
+                <input asp-for="DueDate" class="form-control" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">作成</button>
+            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-secondary">キャンセル</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
