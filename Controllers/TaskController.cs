@@ -125,5 +125,132 @@ namespace TaskManager.Controllers
 
             return RedirectToAction("Index", new { projectId = model.ProjectId });
         }
+
+        // GET: /Project/Edit/5
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var model = new TaskViewModel
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                ProjectName = task.ProjectItem!.Name,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt,
+            };
+
+            return View(model);
+        }
+
+        // POST: /Project/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, TaskViewModel model)
+        {
+
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.Title = model.Title;
+            task.Description = model.Description;
+            task.Status = model.Status;
+            task.Priority = model.Priority;
+            task.DueDate = model.DueDate;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", new { projectId = model.ProjectId });
+
+        }
+
+        // GET: /Project/Delete/5
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var model = new TaskViewModel
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                ProjectName = task.ProjectItem!.Name,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt,
+            };
+
+            return View(model);
+        }
+
+        // POST: /Project/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            _context.TaskItems.Remove(task);
+            await _context.SaveChangesAsync();
+
+            /* DBから取得したtask.ProjectIdを使う理由
+             * Controller側は既にDBからtask(本物のTaskItem)を取得しているので、わざわざフォームから送られてきた(改ざんの可能性がある)model.ProjectIdを信用する必要がない
+             * RemoveはSaveChangesAsync()が呼ばれるまでは、実際にはまだ削除をしない　
+             * また、taskという変数(C#のオブジェクト)自体は、メモリ上にまだ存在し続けているため、task.ProjectIdのように、そのプロパティにアクセスすることは問題なくできる
+            */
+            return RedirectToAction("Index", new { projectId = task.ProjectId });
+        }
     }
 }

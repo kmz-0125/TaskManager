@@ -1,0 +1,32 @@
+﻿@model TaskManager.Models.ViewModels.TaskViewModel
+
+@{
+    ViewData["Title"] = "タスク削除の確認";
+}
+
+<h2>タスク削除の確認</h2>
+
+<dl class="row">
+    <dt class="col-sm-2">タスク名</dt>
+    <dd class="col-sm-10">@Model.Title</dd>
+
+    <dt class="col-sm-2">説明</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+
+    <dt class="col-sm-2">ステータス</dt>
+    <dd class="col-sm-10">@Model.Status</dd>
+
+    <dt class="col-sm-2">優先度</dt>
+    <dd class="col-sm-10">@Model.Priority</dd>
+
+    <dt class="col-sm-2">所属プロジェクト</dt>
+    <dd class="col-sm-10">@Model.ProjectName</dd>
+
+    <dt class="col-sm-2">作成日</dt>
+    <dd class="col-sm-10">@Model.CreatedAt.ToString("yyyy/MM/dd")</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">削除する</button>
+    <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-secondary">キャンセル</a>
+</form>
