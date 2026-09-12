@@ -42,6 +42,8 @@ else
 						/Project/Edit/3 *@
 						<a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-sm btn-secondary">編集</a>
 						<a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-sm btn-danger">削除</a>
+						@*asp-controllerでは接尾語は不要のため、Controller部分より前の名前部分のみ記述*@
+						<a asp-controller="Task" asp-action="Index" asp-route-projectId="@project.Id" class="btn btn-sm btn-primary">タスク一覧を見る</a>
 					</td>
 				</tr>
 			}
