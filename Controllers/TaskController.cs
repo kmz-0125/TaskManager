@@ -252,5 +252,31 @@ namespace TaskManager.Controllers
             */
             return RedirectToAction("Index", new { projectId = task.ProjectId });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeStatus(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.Status = task.Status switch
+            {
+                Models.TaskStatus.NotStarted => Models.TaskStatus.InProgress,
+                Models.TaskStatus.InProgress => Models.TaskStatus.Completed,
+                _ => task.Status // Completedの場合は変化なし
+            };
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", new { projectId = task.ProjectId });
+        }
     }
 }

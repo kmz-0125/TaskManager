@@ -40,6 +40,13 @@ else
 					<td>
 						<a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-secondary">編集</a>
 						<a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">削除</a>
+						@*System.Threading.Tasks.TaskStatusという標準クラスと名前が衝突するリスクがあるため、TaskManager.Models.TaskStatusと完全に書く方法がよい*@
+						@if (task.Status != TaskManager.Models.TaskStatus.Completed)
+						{
+							<form asp-action="ChangeStatus" asp-route-id="@task.Id" method="post" class="d-inline">
+								<button type="submit" class="btn btn-sm btn-danger">ステータス変更</button>
+							</form>
+						}
 					</td>
 				</tr>
 			}
