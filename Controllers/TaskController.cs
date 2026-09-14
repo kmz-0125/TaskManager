@@ -278,5 +278,57 @@ namespace TaskManager.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { projectId = task.ProjectId });
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .Include(t => t.Comments)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            // タスク自体の情報を、TaskViewModelに詰める
+            var taskViewModel = new TaskViewModel
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                ProjectName = task.ProjectItem!.Name,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt
+            };
+
+            // コメントの情報を、List<TaskCommentViewModel>に詰める
+            var commentViewModels = task.Comments// Includeで既にDBに問い合わせ済みのためawaitは不要
+                .Select(c => new TaskCommentViewModel
+                {
+                    Id = c.Id,
+                    Comment = c.Comment,
+                    CreatedAt = c.CreatedAt
+                })
+                .OrderByDescending(c => c.CreatedAt)
+                .ToList();
+
+            // TaskViewModelとcommentViewModelsをまとめて、最終的にViewへ渡すモデルを作る
+            var model = new TaskDetailsViewModel
+            {
+                Task = taskViewModel,
+                Comments = commentViewModels
+            };
+
+            // 4. Viewへ渡す
+            return View(model);
+        }
     }
 }
