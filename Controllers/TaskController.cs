@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TaskManager.Data;
 using TaskManager.Models;
@@ -327,8 +328,41 @@ namespace TaskManager.Controllers
                 Comments = commentViewModels
             };
 
-            // 4. Viewへ渡す
+            // Viewへ渡す
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int id, TaskDetailsViewModel model)
+        {
+            int userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(model.NewComment))
+            {
+                return RedirectToAction("Details", new { id = id });
+            }
+
+            var comment = new TaskComment
+            {
+                TaskItemId = id,
+                Comment = model.NewComment,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.TaskComments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = id });
         }
     }
 }
