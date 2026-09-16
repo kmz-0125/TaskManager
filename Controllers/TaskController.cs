@@ -57,6 +57,7 @@ namespace TaskManager.Controllers
                 .OrderBy(t => t.Status)
                 .ThenByDescending(t => t.Priority)
                 .ToListAsync();
+
             // ControllerからViewへ、一時的なデータを手軽に渡すための仕組み ViewBagは型を指定せず、なんでも自由に詰め込める入れ物
             ViewBag.ProjectId = projectId;
             ViewBag.ProjectName = project.Name;
@@ -193,7 +194,6 @@ namespace TaskManager.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { projectId = model.ProjectId });
-
         }
 
         // GET: /Project/Delete/5
@@ -279,7 +279,6 @@ namespace TaskManager.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { projectId = task.ProjectId });
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Details(int id)
