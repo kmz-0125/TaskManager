@@ -25,7 +25,20 @@ namespace TaskManager.Controllers
             return int.Parse(userIdClaim!.Value);
         }
 
-        // GET: /Task/Index/5  (5はProjectId)
+        private void AddStatusHistory(TaskItem task, TaskManager.Models.TaskStatus oldStatus, TaskManager.Models.TaskStatus newStatus)
+        {
+            var history = new TaskStatusHistory
+            {
+                TaskItemId = task.Id,
+                OldStatus = oldStatus,
+                NewStatus = newStatus,
+                ChangedAt = DateTime.UtcNow
+            };
+
+            _context.TaskStatusHistories.Add(history);
+        }
+
+                // GET: /Task/Index/5  (5はProjectId)
         [HttpGet("Task/Index/{projectId}")]
         public async Task<IActionResult> Index(int projectId)
         {
@@ -186,11 +199,20 @@ namespace TaskManager.Controllers
                 return NotFound();
             }
 
+            var oldStatus = task.Status;
+
             task.Title = model.Title;
             task.Description = model.Description;
             task.Status = model.Status;
             task.Priority = model.Priority;
             task.DueDate = model.DueDate;
+
+            var newStatus = task.Status;
+
+            if (oldStatus != newStatus)
+            {
+                AddStatusHistory(task, oldStatus, newStatus);
+            }
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { projectId = model.ProjectId });
@@ -269,12 +291,18 @@ namespace TaskManager.Controllers
                 return NotFound();
             }
 
+            var oldStatus = task.Status;
+
             task.Status = task.Status switch
             {
                 Models.TaskStatus.NotStarted => Models.TaskStatus.InProgress,
                 Models.TaskStatus.InProgress => Models.TaskStatus.Completed,
                 _ => task.Status // Completedの場合は変化なし
             };
+
+            var newStatus = task.Status;
+
+            AddStatusHistory(task, oldStatus, newStatus);
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", new { projectId = task.ProjectId });
@@ -363,5 +391,6 @@ namespace TaskManager.Controllers
 
             return RedirectToAction("Details", new { id = id });
         }
+
     }
 }
