@@ -2,30 +2,30 @@
 @using TaskManager.Extensions
 
 @{
-    ViewData["Title"] = "タスク詳細";
+	ViewData["Title"] = "タスク詳細";
 }
 
 @*TaskDetailsViewModelのTaskプロパティの中にtitleなどの情報が入っている*@
 <h2>@Model.Task.Title</h2>
 
 <dl class="row">
-    <dt class="col-sm-2">説明</dt>
-    <dd class="col-sm-10">@Model.Task.Description</dd>
+	<dt class="col-sm-2">説明</dt>
+	<dd class="col-sm-10">@Model.Task.Description</dd>
 
-    <dt class="col-sm-2">ステータス</dt>
-    <dd class="col-sm-10">@Model.Task.Status.GetDisplayName()</dd>
+	<dt class="col-sm-2">ステータス</dt>
+	<dd class="col-sm-10">@Model.Task.Status.GetDisplayName()</dd>
 
-    <dt class="col-sm-2">優先度</dt>
-    <dd class="col-sm-10">@Model.Task.Priority.GetDisplayName()</dd>
+	<dt class="col-sm-2">優先度</dt>
+	<dd class="col-sm-10">@Model.Task.Priority.GetDisplayName()</dd>
 
-    <dt class="col-sm-2">期限</dt>
-    <dd class="col-sm-10">@(Model.Task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</dd>
+	<dt class="col-sm-2">期限</dt>
+	<dd class="col-sm-10">@(Model.Task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</dd>
 
-    <dt class="col-sm-2">所属プロジェクト</dt>
-    <dd class="col-sm-10">@Model.Task.ProjectName</dd>
+	<dt class="col-sm-2">所属プロジェクト</dt>
+	<dd class="col-sm-10">@Model.Task.ProjectName</dd>
 
-    <dt class="col-sm-2">作成日</dt>
-    <dd class="col-sm-10">@Model.Task.CreatedAt.ToString("yyyy/MM/dd")</dd>
+	<dt class="col-sm-2">作成日</dt>
+	<dd class="col-sm-10">@Model.Task.CreatedAt.ToString("yyyy/MM/dd")</dd>
 </dl>
 
 <a asp-action="Edit" asp-route-id="@Model.Task.Id" class="btn btn-secondary">編集する</a>
@@ -37,32 +37,51 @@
 
 @if (!Model.Comments.Any())
 {
-    <p>まだコメントがありません。</p>
+	<p>まだコメントがありません。</p>
 }
 else
 {
-    <ul class="list-group mb-3">
-        @foreach (var comment in Model.Comments)
-        {
-            <li class="list-group-item">
-                <div>@comment.Comment</div>
-                <small class="text-muted">@comment.CreatedAt.ToString("yyyy/MM/dd HH:mm")</small>
-            </li>
-        }
-    </ul>
+	<ul class="list-group mb-3">
+		@foreach (var comment in Model.Comments)
+		{
+			<li class="list-group-item">
+				<div>@comment.Comment</div>
+				<small class="text-muted">@comment.CreatedAt.ToString("yyyy/MM/dd HH:mm")</small>
+			</li>
+		}
+	</ul>
 }
 
 <form asp-action="AddComment" asp-route-id="@Model.Task.Id" method="post">
-    <div class="form-group mb-3">
-        <label asp-for="NewComment" class="form-label"></label>
-        <textarea asp-for="NewComment" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="NewComment" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">コメントを投稿</button>
+	<div class="form-group mb-3">
+		<label asp-for="NewComment" class="form-label"></label>
+		<textarea asp-for="NewComment" class="form-control" rows="3"></textarea>
+		<span asp-validation-for="NewComment" class="text-danger"></span>
+	</div>
+	<button type="submit" class="btn btn-primary">コメントを投稿</button>
 </form>
 
+<h3>履歴</h3>
+
+@if (!Model.StatusHistories.Any())
+{
+	<p>まだ履歴がありません。</p>
+}
+else
+{
+	<ul class="list-group mb-3">
+		@foreach (var status in Model.StatusHistories)
+		{
+			<li class="list-group-item">
+				<div>@status.OldStatus.GetDisplayName()</div> → <div>@status.NewStatus.GetDisplayName()</div>
+				<small class="text-muted">@status.ChangedAt.ToString("yyyy/MM/dd HH:mm")</small>
+			</li>
+		}
+	</ul>
+}
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }

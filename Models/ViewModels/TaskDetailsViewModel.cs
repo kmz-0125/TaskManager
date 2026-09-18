@@ -9,6 +9,8 @@ namespace TaskManager.Models.ViewModels
         // コメント一覧表示専用のリスト
         public List<TaskCommentViewModel> Comments { get; set; } = new();
 
+        public List<TaskStatusHistoryViewModel> StatusHistories { get; set; } = new();
+
         // コメント投稿専用
         [Required(ErrorMessage = "コメントを入力してください")]
         [MaxLength(1000)]

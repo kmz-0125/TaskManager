@@ -38,7 +38,7 @@ namespace TaskManager.Controllers
             _context.TaskStatusHistories.Add(history);
         }
 
-                // GET: /Task/Index/5  (5はProjectId)
+        // GET: /Task/Index/5  (5はProjectId)
         [HttpGet("Task/Index/{projectId}")]
         public async Task<IActionResult> Index(int projectId)
         {
@@ -268,10 +268,11 @@ namespace TaskManager.Controllers
             _context.TaskItems.Remove(task);
             await _context.SaveChangesAsync();
 
-            /* DBから取得したtask.ProjectIdを使う理由
-             * Controller側は既にDBからtask(本物のTaskItem)を取得しているので、わざわざフォームから送られてきた(改ざんの可能性がある)model.ProjectIdを信用する必要がない
-             * RemoveはSaveChangesAsync()が呼ばれるまでは、実際にはまだ削除をしない　
-             * また、taskという変数(C#のオブジェクト)自体は、メモリ上にまだ存在し続けているため、task.ProjectIdのように、そのプロパティにアクセスすることは問題なくできる
+            /* 
+             DBから取得したtask.ProjectIdを使う理由
+             Controller側は既にDBからtask(本物のTaskItem)を取得しているので、わざわざフォームから送られてきた(改ざんの可能性がある)model.ProjectIdを信用する必要がない
+             RemoveはSaveChangesAsync()が呼ばれるまでは、実際にはまだ削除をしない　
+             また、taskという変数(C#のオブジェクト)自体は、メモリ上にまだ存在し続けているため、task.ProjectIdのように、そのプロパティにアクセスすることは問題なくできる
             */
             return RedirectToAction("Index", new { projectId = task.ProjectId });
         }
@@ -316,6 +317,7 @@ namespace TaskManager.Controllers
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
                 .Include(t => t.Comments)
+                .Include(t => t.StatusHistories)
                 .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
 
             if (task == null)
@@ -348,11 +350,24 @@ namespace TaskManager.Controllers
                 .OrderByDescending(c => c.CreatedAt)
                 .ToList();
 
+            // 履歴のステータスをList<TaskStatusHistoryViewModel>に詰める
+            var statusHistories = task.StatusHistories
+                .Select(h => new TaskStatusHistoryViewModel
+                {
+                    Id = h.Id,
+                    OldStatus = h.OldStatus,
+                    NewStatus = h.NewStatus,
+                    ChangedAt = h.ChangedAt
+                })
+                .OrderByDescending(h => h.ChangedAt)
+                .ToList();
+
             // TaskViewModelとcommentViewModelsをまとめて、最終的にViewへ渡すモデルを作る
             var model = new TaskDetailsViewModel
             {
                 Task = taskViewModel,
-                Comments = commentViewModels
+                Comments = commentViewModels,
+                StatusHistories = statusHistories
             };
 
             // Viewへ渡す
@@ -391,6 +406,5 @@ namespace TaskManager.Controllers
 
             return RedirectToAction("Details", new { id = id });
         }
-
     }
 }
