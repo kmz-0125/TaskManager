@@ -19,13 +19,13 @@
 	<dd class="col-sm-10">@Model.Task.Priority.GetDisplayName()</dd>
 
 	<dt class="col-sm-2">期限</dt>
-	<dd class="col-sm-10">@(Model.Task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</dd>
+	<dd class="col-sm-10">@(Model.Task.DueDate?.ToJstString("yyyy/MM/dd") ?? "未設定")</dd>
 
 	<dt class="col-sm-2">所属プロジェクト</dt>
 	<dd class="col-sm-10">@Model.Task.ProjectName</dd>
 
 	<dt class="col-sm-2">作成日</dt>
-	<dd class="col-sm-10">@Model.Task.CreatedAt.ToString("yyyy/MM/dd")</dd>
+	<dd class="col-sm-10">@Model.Task.CreatedAt.ToJstString("yyyy/MM/dd")</dd>
 </dl>
 
 <a asp-action="Edit" asp-route-id="@Model.Task.Id" class="btn btn-secondary">編集する</a>
@@ -46,7 +46,7 @@ else
 		{
 			<li class="list-group-item">
 				<div>@comment.Comment</div>
-				<small class="text-muted">@comment.CreatedAt.ToString("yyyy/MM/dd HH:mm")</small>
+				<small class="text-muted">@comment.CreatedAt.ToJstString("yyyy/MM/dd HH:mm")</small>
 			</li>
 		}
 	</ul>
@@ -74,7 +74,7 @@ else
 		{
 			<li class="list-group-item">
 				<div>@status.OldStatus.GetDisplayName()</div> → <div>@status.NewStatus.GetDisplayName()</div>
-				<small class="text-muted">@status.ChangedAt.ToString("yyyy/MM/dd HH:mm")</small>
+				<small class="text-muted">@status.ChangedAt.ToJstString("yyyy/MM/dd HH:mm")</small>
 			</li>
 		}
 	</ul>

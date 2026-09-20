@@ -1,4 +1,5 @@
 ﻿@model TaskManager.Models.ViewModels.TaskViewModel
+@using TaskManager.Extensions
 
 @{
 	ViewData["Title"] = "タスク編集";
@@ -48,11 +49,11 @@
 
 			<div class="form-group mb-3">
 				<label class="form-label">作成日</label>
-				<p class="form-control-plaintext">@Model.CreatedAt.ToString("yyyy/MM/dd")</p>
+				<p class="form-control-plaintext">@Model.CreatedAt.ToJstString("yyyy/MM/dd")</p>
 			</div>
 
 			<button type="submit" class="btn btn-primary">更新</button>
-			<a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-secondary">キャンセル</a>
+			<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">キャンセル</a>
 		</form>
 	</div>
 </div>

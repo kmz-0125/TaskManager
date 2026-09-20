@@ -1,4 +1,5 @@
 ﻿@model TaskManager.Models.ViewModels.ProjectViewModel
+@using TaskManager.Extensions
 
 @{
     ViewData["Title"] = "プロジェクト削除の確認";
@@ -19,7 +20,7 @@
     <dd class="col-sm-10">@Model.Description</dd>
 
     <dt class="col-sm-2">作成日</dt>
-    <dd class="col-sm-10">@Model.CreatedAt.ToString("yyyy/MM/dd")</dd>
+    <dd class="col-sm-10">@Model.CreatedAt.ToJstString("yyyy/MM/dd")</dd>
 </dl>
 
 <form asp-action="Delete" asp-route-id="@Model.Id" method="post">

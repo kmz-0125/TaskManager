@@ -36,7 +36,7 @@ else
 					<td>@task.Status.GetDisplayName()</td>
 					<td>@task.Priority.GetDisplayName()</td>
 					@*DueDateが設定されている場合 → "2026/09/15"と表示 DueDateが設定されていない場合(null) → "未設定"と表示*@
-					<td>@(task.DueDate?.ToString("yyyy/MM/dd") ?? "未設定")</td>
+					<td>@(task.DueDate?.ToJstString("yyyy/MM/dd") ?? "未設定")</td>
 					<td>
 						<a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-secondary">編集</a>
 						<a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">削除</a>

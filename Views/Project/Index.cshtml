@@ -1,5 +1,6 @@
 ﻿@*projectsが、List<ProjectViewModel>型のため型が一致している必要がある*@
 @model List<TaskManager.Models.ViewModels.ProjectViewModel>
+@using TaskManager.Extensions
 
 @{
 	ViewData["Title"] = "プロジェクト一覧";
@@ -35,7 +36,7 @@ else
 					<td>@project.Name</td>
 					<td>@project.Description</td>
 					<td>@project.TaskCount</td>
-					<td>@project.CreatedAt.ToString("yyyy/MM/dd")</td>
+					<td>@project.CreatedAt.ToJstString("yyyy/MM/dd")</td>
 					<td>
 						@*asp-route-id:URLの一部としてパラメータ(ID)を渡す必要がある時に用いる
 						例えばproject.Idが3だった場合、以下のようなURLが自動生成される
