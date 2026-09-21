@@ -43,9 +43,11 @@ namespace TaskManager.Controllers
                 return View(model);
             }
 
-            // メールアドレスの重複チェック(DBのUsersテーブルの内容を確認)
-            // メールアドレスが一致するレコードを検索し、最初の1件を取得(なければnull)
-            // ※Emailには一意制約があるため、通常は0件か1件がヒットする
+            /*
+             メールアドレスの重複チェック(DBのUsersテーブルの内容を確認)
+             メールアドレスが一致するレコードを検索し、最初の1件を取得(なければnull)
+             ※Emailには一意制約があるため、通常は0件か1件がヒットする
+            */
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
 
@@ -72,9 +74,11 @@ namespace TaskManager.Controllers
 
             // DBにユーザーを登録するための準備
             _context.Users.Add(user);
-            // DBに反映　変更をある程度溜めておき、SaveChangesが呼ばれた時にまとめて実行
-            // 理由1．パフォーマンス：DBとの通信回数を減らし、処理を効率化する(notストアドプロシージャ)
-            // 理由2.データ整合性：複数の変更を「全部成功」か「全部失敗」かのどちらかに保証し、中途半端な状態を防ぐ
+            /* 
+             DBに反映　変更をある程度溜めておき、SaveChangesが呼ばれた時にまとめて実行
+             理由1．パフォーマンス：DBとの通信回数を減らし、処理を効率化する(notストアドプロシージャ)
+             理由2.データ整合性：複数の変更を「全部成功」か「全部失敗」かのどちらかに保証し、中途半端な状態を防ぐ
+            */
             await _context.SaveChangesAsync();
             // RedirectToActionはブラウザに対して別のURLへ改めてアクセスし直すことを指示している
             return RedirectToAction("Login");
@@ -102,10 +106,12 @@ namespace TaskManager.Controllers
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-            // Verify()
-            // user.PasswordHash(DBに保存されているハッシュ値)の中に埋め込まれているソルト情報を取り出す
-            // そのソルトを使って、今回入力されたmodel.Password(生のパスワード)を同じ手順で再度ハッシュ化する
-            // 計算し直した結果が、DBに保存されているハッシュ値と完全に一致するかどうかを比較する
+            /*
+             Verify()
+             user.PasswordHash(DBに保存されているハッシュ値)の中に埋め込まれているソルト情報を取り出す
+             そのソルトを使って、今回入力されたmodel.Password(生のパスワード)を同じ手順で再度ハッシュ化する
+             計算し直した結果が、DBに保存されているハッシュ値と完全に一致するかどうかを比較する
+            */
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
                 // 引数が空文字の理由：どの項目が問題なのかわからないようにしている→不正ログインのための情報を与えないようにするため
@@ -113,9 +119,11 @@ namespace TaskManager.Controllers
                 return View(model);
             }
 
-            // ログイン成功 →Claimを作成
-            // Claim(クレーム)とは、「このユーザーに関する情報の断片」
-            // List化して複数の情報をひとまとめにする
+            /*
+            ログイン成功 →Claimを作成
+            Claim(クレーム)とは、「このユーザーに関する情報の断片」
+            List化して複数の情報をひとまとめにする
+            */
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),// Identifier:“ユーザーを一意に識別するID”という種類の情報です　という型(種類)の指定
@@ -134,11 +142,13 @@ namespace TaskManager.Controllers
                 IsPersistent = model.RememberMe,
             };
 
-            // 処理中のリクエストに関する情報を扱っている
-            // 第一引数:Cookie認証の方式で」という指定
-            // 第二引数:認証済みの主体(この処理を行っている本人)」を表すオブジェクト
-            // 第三引数:「保持するかどうか」などの追加設定
-            // 認証済みの本人であるという確認とログインユーザーとして扱うための処理を行っている
+            /* 
+            処理中のリクエストに関する情報を扱っている
+            第一引数:Cookie認証の方式で」という指定
+            第二引数:認証済みの主体(この処理を行っている本人)」を表すオブジェクト
+            第三引数:「保持するかどうか」などの追加設定
+            認証済みの本人であるという確認とログインユーザーとして扱うための処理を行っている
+            */
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
