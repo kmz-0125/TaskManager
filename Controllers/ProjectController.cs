@@ -19,18 +19,18 @@ namespace TaskManager.Controllers
         }
 
         // ログイン中のユーザーIDを取得するヘルパーメソッド
-        private int GetCurrentUserId()
+        private string GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             // Claimの値は常に文字列として保存されているため変換しなおす必要がある
             // !(Null許容演算子):「このClaimは、ログイン済みである以上、絶対にnullにはならないはず」という開発者による保証を、コンパイラに伝えるための記号
-            return int.Parse(userIdClaim!.Value);
+            return userIdClaim!.Value;
         }
 
         // GET: /Project
         public async Task<IActionResult> Index()
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             // 自分が所有するプロジェクトのみ取得
             var projects = await _context.ProjectItems
@@ -67,7 +67,7 @@ namespace TaskManager.Controllers
                 return View(model);
             }
 
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var project = new ProjectItem
             {
@@ -88,7 +88,7 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             /* Id一致だけでなくUserId一致も条件に含め、他人のプロジェクトを弾く
              「指定されたIDのプロジェクトが存在するか」だけでなく、「それが本当に自分のプロジェクトか」まで、1つのクエリで同時にチェック
@@ -132,7 +132,7 @@ namespace TaskManager.Controllers
                 return View(model);
             }
 
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
 
             var project = await _context.ProjectItems
@@ -154,7 +154,7 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var project = await _context.ProjectItems
                 .Include(p => p.Tasks)// プロジェクトに関連するタスクも同時に読み込む
@@ -182,7 +182,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var project = await _context.ProjectItems
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;// Cookie認証関連の機能を使うために必要な名前空間
+using Microsoft.AspNetCore.Identity;
+using TaskManager.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,19 +16,29 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Cookie認証を追加(DIコンテナに登録)
-// .AddAuthentication(...):「このアプリで認証機能を使います」という宣言
-// CookieAuthenticationDefaults.AuthenticationScheme:「認証の方式(スキーム)は、Cookieベースにします」という指定
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>                                                           
-    {
-        options.LoginPath = "/Account/Login";// ログインしていないユーザーが、認証が必要なページにアクセスしようとした時、自動的にこのURLへリダイレクトする
-        options.LogoutPath = "/Account/Logout";// それぞれの状況で使われるURLをあらかじめ指定
-        options.AccessDeniedPath = "/Account/AccessDenied";// それぞれの状況で使われるURLをあらかじめ指定
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);// ログイン状態(Cookie)の有効期限
-        options.SlidingExpiration = true;// スライディング有効期限」という機能。ユーザーがアプリを操作するたびに、有効期限が7日間にリセットされ続ける設定。
-                                         // falseにすると、最初にログインした時点から7日間経てば、操作していても強制的にログアウト
-    });
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // パスワードの要件を設定(今回は当初の仕様に合わせて、8文字以上のみを必須とする)
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+})
+    // Identityが管理するユーザー情報などをAppDbContext(PostgreSQL)に保存してくださいという指定
+    .AddEntityFrameworkStores<AppDbContext>()
+    // Identityが提供するトークン(一時的な認証コード)関連の機能を有効にする設定
+    .AddDefaultTokenProviders();
+
+// Cookie自体の細かい挙動(ログインパス、有効期限など)を設定
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -50,6 +62,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

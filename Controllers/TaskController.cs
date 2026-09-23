@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TaskManager.Data;
 using TaskManager.Models;
 using TaskManager.Models.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 namespace TaskManager.Controllers
 {
@@ -21,10 +20,10 @@ namespace TaskManager.Controllers
             _context = context;
         }
 
-        private int GetCurrentUserId()
+        private string GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            return int.Parse(userIdClaim!.Value);
+            return userIdClaim!.Value;
         }
 
         private void AddStatusHistory(TaskItem task, TaskManager.Models.TaskStatus oldStatus, TaskManager.Models.TaskStatus newStatus)
@@ -66,7 +65,7 @@ namespace TaskManager.Controllers
         [HttpGet("Task/Index/{projectId}")]
         public async Task<IActionResult> Index(int projectId)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             // 指定されたプロジェクトが、本当に自分のものか確認
             var project = await _context.ProjectItems
@@ -106,7 +105,7 @@ namespace TaskManager.Controllers
         [HttpGet("Task/Create/{projectId}")]
         public async Task<IActionResult> Create(int projectId)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var project = await _context.ProjectItems
                 .FirstOrDefaultAsync(p => p.Id == projectId && p.UserId == userId);
@@ -130,7 +129,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TaskViewModel model)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             // 所属先のプロジェクトが、本当に自分のものか確認(なりすまし防止)
             var project = await _context.ProjectItems
@@ -169,7 +168,7 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -212,7 +211,7 @@ namespace TaskManager.Controllers
                 return View(model);
             }
 
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -246,7 +245,7 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -278,7 +277,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -305,7 +304,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeStatus(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -336,7 +335,7 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)
@@ -402,7 +401,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddComment(int id, TaskDetailsViewModel model)
         {
-            int userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();
 
             var task = await _context.TaskItems
                 .Include(t => t.ProjectItem)

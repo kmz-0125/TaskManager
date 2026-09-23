@@ -1,19 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace TaskManager.Data
 {
-    public class AppDbContext : DbContext// EF CoreのDbContextクラスを継承
+    public class AppDbContext : IdentityDbContext<ApplicationUser> // IdentityDbContextクラスを継承
     {
         // コンストラクタ
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
-        // DbSet<T> プロパティ
-        // Modelクラスに対応するテーブルを操作する窓口
-        // 5つのModelクラスそれぞれに対してDbSetを用意
-        public DbSet<User> Users { get; set; }
+        /*
+        DbSet<T> プロパティ
+        Modelクラスに対応するテーブルを操作する窓口
+        Modelクラスそれぞれに対してDbSetを用意
+        */
         public DbSet<ProjectItem> ProjectItems { get; set; }
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<TaskComment> TaskComments { get; set; }
@@ -23,11 +25,6 @@ namespace TaskManager.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Userのメールアドレスは一意にする
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
 
             // Enumを文字列としてDBに保存する（可読性のため）
             modelBuilder.Entity<TaskItem>()

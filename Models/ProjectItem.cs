@@ -28,14 +28,15 @@ namespace TaskManager.Models
 
         // 外部キー
         [ForeignKey(nameof(User))]// 「UserIdはUserプロパティに対応する外部キーですよ」とEF Coreに明示的に伝えている
-        public int UserId { get; set; }// 実際にDBのテーブルに保存される列（外部キーそのもの）
-        
+        public string UserId { get; set; } = string.Empty;
+
         /*
          C#上で親のUserオブジェクトを直接たどるためのナビゲーションプロパティ
          EF Coreは指定しない限り自動的に関連データを読み込まない（遅延読み込みしない設定がデフォルト）ため、
          実際にコード上で意図的に読み込む処理（Includeなど）をしない限り、この値はNULLのまま。
         */
-        public User? User { get; set; }
+        public ApplicationUser? User { get; set; }
+
 
         // ナビゲーションプロパティ
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
