@@ -15,10 +15,10 @@
     <dd class="col-sm-10">@Model.Description</dd>
 
     <dt class="col-sm-2">ステータス</dt>
-    <dd class="col-sm-10">@Model.Status</dd>
+    <dd class="col-sm-10">@Model.Status.GetDisplayName()</dd>
 
     <dt class="col-sm-2">優先度</dt>
-    <dd class="col-sm-10">@Model.Priority</dd>
+    <dd class="col-sm-10">@Model.Priority.GetDisplayName()</dd>
 
     <dt class="col-sm-2">所属プロジェクト</dt>
     <dd class="col-sm-10">@Model.ProjectName</dd>
