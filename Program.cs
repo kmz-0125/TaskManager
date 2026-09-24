@@ -3,6 +3,7 @@ using TaskManager.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;// Cookie認証関連の機能を使うために必要な名前空間
 using Microsoft.AspNetCore.Identity;
 using TaskManager.Models;
+using TaskManager.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     // Identityが管理するユーザー情報などをAppDbContext(PostgreSQL)に保存してくださいという指定
     .AddEntityFrameworkStores<AppDbContext>()
     // Identityが提供するトークン(一時的な認証コード)関連の機能を有効にする設定
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    // エラーメッセージを日本語に変更
+    .AddErrorDescriber<JapaneseIdentityErrorDescriber>();
 
 // Cookie自体の細かい挙動(ログインパス、有効期限など)を設定
 builder.Services.ConfigureApplicationCookie(options =>
