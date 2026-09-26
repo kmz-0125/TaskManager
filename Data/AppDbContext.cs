@@ -20,6 +20,7 @@ namespace TaskManager.Data
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<TaskComment> TaskComments { get; set; }
         public DbSet<TaskStatusHistory> TaskStatusHistories { get; set; }
+        public DbSet<Holiday> Holidays { get; set; }
 
         // Data Annotations（[Required]など）だけでは表現しきれない、より詳細なDB設計のルールをここで指定
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,6 +43,10 @@ namespace TaskManager.Data
             modelBuilder.Entity<TaskStatusHistory>()
                 .Property(t => t.NewStatus)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Holiday>()
+                .HasIndex(h => h.Date)
+                .IsUnique();
         }
     }
 }
