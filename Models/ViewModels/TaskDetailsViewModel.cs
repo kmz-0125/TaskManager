@@ -16,6 +16,9 @@ namespace TaskManager.Models.ViewModels
         [MaxLength(1000)]
         [Display(Name = "コメント")]
         public string NewComment { get; set; } = string.Empty;
+
+        // 祝日名を入れるプロパティ
+        public string? DueDateHolidayName { get; set; }
     }
 
     public class TaskCommentViewModel

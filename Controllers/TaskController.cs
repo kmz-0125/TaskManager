@@ -385,12 +385,24 @@ namespace TaskManager.Controllers
                 .OrderByDescending(h => h.ChangedAt)
                 .ToList();
 
+            string? holidayName = null;
+
+            // タスクの期限(task.DueDate)が設定されているか確認
+            if (task.DueDate.HasValue)
+            {
+                var holiday = await _context.Holidays
+                    .FirstOrDefaultAsync(h => h.Date == task.DueDate.Value.Date);// 期限の時刻部分を切り捨てて、日付だけにする
+
+                holidayName = holiday?.HolidayName;
+            }
+
             // TaskViewModelとcommentViewModelsをまとめて、最終的にViewへ渡すモデルを作る
             var model = new TaskDetailsViewModel
             {
                 Task = taskViewModel,
                 Comments = commentViewModels,
-                StatusHistories = statusHistories
+                StatusHistories = statusHistories,
+                DueDateHolidayName = holidayName
             };
 
             // Viewへ渡す

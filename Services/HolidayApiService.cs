@@ -43,7 +43,7 @@ namespace TaskManager.Services
             {
                 // pair.Key に、日付(文字列)が入っている
                 // pair.Value に、祝日名が入っている
-                DateTime parseDate = DateTime.Parse(pair.Key);
+                DateTime parseDate = DateTime.SpecifyKind(DateTime.Parse(pair.Key), DateTimeKind.Utc);
 
                 var holiday = new Holiday
                 {

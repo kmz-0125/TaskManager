@@ -1,9 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;// Cookie認証関連の機能を使うために必要な名前空間
 using Microsoft.AspNetCore.Identity;
-using TaskManager.Models;
+using Microsoft.EntityFrameworkCore;
+using TaskManager.Data;
 using TaskManager.Extensions;
+using TaskManager.Models;
+using TaskManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +44,25 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+// HttpClientの登録
+builder.Services.AddHttpClient<HolidayApiService>();
+
 var app = builder.Build();
+
+// アプリ起動時に祝日データを取得してDBに保存する
+using (var scope = app.Services.CreateScope())
+{
+    // 外部のサービスは失敗するものとして設計する
+    try
+    {
+        var holidayService = scope.ServiceProvider.GetRequiredService<HolidayApiService>();
+        await holidayService.FetchAndSaveHolidaysAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "祝日データの取得に失敗しました");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
