@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;// Cookie認証関連の機能を使うために必要な名前空間
+// using Microsoft.AspNetCore.Authentication.Cookies; Cookie認証関連の機能を使うために必要な名前空間(Identityを用いる場合は不要)
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
@@ -7,9 +7,6 @@ using TaskManager.Models;
 using TaskManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -47,6 +44,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 // HttpClientの登録
 builder.Services.AddHttpClient<HolidayApiService>();
 
+// Swagger(APIの仕様書を自動生成する)。今回は "api/" で始まるルートだけを対象にする
+builder.Services.AddSwaggerGen(options =>
+{
+    options.DocInclusionPredicate((docName, apiDesc) =>
+    apiDesc.RelativePath != null && apiDesc.RelativePath.StartsWith("api/"));
+});
+
 var app = builder.Build();
 
 // アプリ起動時に祝日データを取得してDBに保存する
@@ -70,6 +74,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
