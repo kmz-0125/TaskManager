@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TaskManager.Data;
 using TaskManager.Models.Dtos;
+using TaskManager.Models.ViewModels;
 
 namespace TaskManager.Controllers.Api
 {
@@ -49,6 +50,36 @@ namespace TaskManager.Controllers.Api
                 .ToListAsync();
 
             return Ok(tasks);
+        }
+
+        // GET: api/tasks/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTask(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var model = new TaskDto
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt
+            };
+
+            return Ok(model);
         }
     }
 }
