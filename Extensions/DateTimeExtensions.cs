@@ -12,5 +12,15 @@
 
             return jstDateTime.ToString(format);
         }
+
+        public static DateTime? ToUtcKind(this DateTime? dateTime)
+        {
+            if (dateTime == null)
+            {
+                return null;
+            }
+
+            return DateTime.SpecifyKind(dateTime.Value, DateTimeKind.Utc);
+        }
     }
 }

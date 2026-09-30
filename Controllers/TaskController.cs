@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TaskManager.Data;
+using TaskManager.Extensions;
 using TaskManager.Models;
 using TaskManager.Models.ViewModels;
 
@@ -37,28 +38,6 @@ namespace TaskManager.Controllers
             };
 
             _context.TaskStatusHistories.Add(history);
-        }
-
-        private DateTime? ToUtcKind(DateTime? dueDate)
-        {
-            if (dueDate == null)
-            {
-                return null;
-            }
-
-            DateTime changeTime;
-            changeTime = DateTime.SpecifyKind(dueDate.Value, DateTimeKind.Utc);
-            return changeTime;
-
-            /*
-            Null条件演算子(?.)を使った、より簡潔な書き方(参考)
-            private DateTime? ToUtcKind(DateTime? dateTime)
-            {
-                return dateTime.HasValue
-                ? DateTime.SpecifyKind(dateTime.Value, DateTimeKind.Utc)
-                : null;
-            }
-            */
         }
 
         // GET: /Task/Index/5  (5はProjectId)
@@ -154,7 +133,7 @@ namespace TaskManager.Controllers
                 Description = model.Description,
                 Status = model.Status,
                 Priority = model.Priority,
-                DueDate = ToUtcKind(model.DueDate),
+                DueDate = model.DueDate.ToUtcKind(),
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -228,7 +207,7 @@ namespace TaskManager.Controllers
             task.Description = model.Description;
             task.Status = model.Status;
             task.Priority = model.Priority;
-            task.DueDate = ToUtcKind(model.DueDate);
+            task.DueDate = model.DueDate.ToUtcKind();
 
             var newStatus = task.Status;
 

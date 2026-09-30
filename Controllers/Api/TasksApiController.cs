@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TaskManager.Data;
+using TaskManager.Extensions;
+using TaskManager.Models;
 using TaskManager.Models.Dtos;
 using TaskManager.Models.ViewModels;
 
@@ -80,6 +82,52 @@ namespace TaskManager.Controllers.Api
             };
 
             return Ok(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] CreateTaskDto dto) //JSONを受け取るには、引数に[FromBody]という新しい属性を付ける
+        {
+            var userId = GetCurrentUserId();
+
+            // 所属プロジェクトが本当に自分のものか確認する(NotFound)
+            var project = await _context.ProjectItems
+                .FirstOrDefaultAsync(p => p.Id == dto.ProjectId && p.UserId == userId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            // 新しいTaskItemを作成し、DBに保存する
+            var task = new TaskItem
+            {
+                ProjectId = dto.ProjectId,
+                Title = dto.Title,
+                Description = dto.Description,
+                Status = dto.Status,
+                Priority = dto.Priority,
+                DueDate = dto.DueDate.ToUtcKind(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.TaskItems.Add(task);
+            await _context.SaveChangesAsync();
+
+            // 作成したタスクをTaskDtoに詰め替えて、Ok(dto)で返す
+            // 本来CreatedAtAction(...)という、201(作成成功)を表す専用のメソッドを使うのがWebAPIの定石
+            var result = new TaskDto
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = dto.DueDate.ToUtcKind(),
+                CreatedAt = task.CreatedAt
+            };
+
+            return Ok(result);
         }
     }
 }
