@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -28,6 +29,18 @@ namespace TaskManager.Controllers.Api
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             return userIdClaim!.Value;
+        }
+        private void AddStatusHistory(TaskItem task, TaskManager.Models.TaskStatus oldStatus, TaskManager.Models.TaskStatus newStatus)
+        {
+            var history = new TaskStatusHistory
+            {
+                TaskItemId = task.Id,
+                OldStatus = oldStatus,
+                NewStatus = newStatus,
+                ChangedAt = DateTime.UtcNow
+            };
+
+            _context.TaskStatusHistories.Add(history);
         }
 
         // GET: api/tasks
@@ -124,6 +137,58 @@ namespace TaskManager.Controllers.Api
                 Status = task.Status,
                 Priority = task.Priority,
                 DueDate = dto.DueDate.ToUtcKind(),
+                CreatedAt = task.CreatedAt
+            };
+
+            return Ok(result);
+        }
+
+        // PUT: api/tasks/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateTaskDto dto)
+        {
+            var userId = GetCurrentUserId();
+
+            // 所有者チェック(タスクが本当に自分のものか)
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            // タスクの各項目を、dtoの内容で書き換える(DueDateはToUtcKind()を忘れずに)
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var oldStatus = task.Status;
+
+            task.Title = dto.Title;
+            task.Description = dto.Description;
+            task.Status = dto.Status;
+            task.Priority = dto.Priority;
+            task.DueDate = dto.DueDate.ToUtcKind();
+
+            var newStatus = task.Status;
+
+            // ステータス変更があれば、AddStatusHistoryを呼ぶかどうかも考えてみる(任意)
+            if (oldStatus != newStatus)
+            {
+                AddStatusHistory(task, oldStatus, newStatus);
+            }
+
+            // SaveChangesAsync
+            await _context.SaveChangesAsync();
+
+            // 更新後の内容をTaskDtoに詰め替えて、Ok(dto)で返す
+            var result = new TaskDto
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                Priority = task.Priority,
+                DueDate = task.DueDate,
                 CreatedAt = task.CreatedAt
             };
 

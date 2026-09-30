@@ -179,7 +179,6 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TaskViewModel model)
         {
-
             if (id != model.Id)
             {
                 return NotFound();
