@@ -194,5 +194,29 @@ namespace TaskManager.Controllers.Api
 
             return Ok(result);
         }
+
+        // DELETE: api/tasks/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            // 所有者チェック(タスクが本当に自分のものか)
+            var task = await _context.TaskItems
+                .Include(t => t.ProjectItem)
+                .FirstOrDefaultAsync(t => t.Id == id && t.ProjectItem!.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            // 削除、SaveChangesAsync
+            _context.TaskItems.Remove(task);
+            await _context.SaveChangesAsync();
+
+            // 「削除に成功しました。返すデータは特にありません」という意味のステータスコード(204)
+            return NoContent();
+        }
     }
 }
