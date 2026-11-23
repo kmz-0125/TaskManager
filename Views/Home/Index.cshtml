@@ -1,8 +1,23 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "タスク管理アプリ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2>プロジェクトごとにタスクを管理できます</h2>
+
+<div class="text-sm-start">
+	@if (User.Identity != null && User.Identity.IsAuthenticated)
+	{
+		<a asp-controller="Project" asp-action="Index" class="btn btn-primary">プロジェクト一覧へ</a>
+	}
+	else
+	{
+		<div class="mt-4">
+			<p>登録済みの方はログインボタンからお進みください。</p>
+			<a class="btn btn-primary" asp-controller="Account" asp-action="Login">ログイン</a>
+		</div>
+		<div class="mt-5">
+			<p>	未登録の方は新規登録ボタンから登録をお願いします。</p>
+			<a class="btn btn-primary" asp-controller="Account" asp-action="Register">新規登録</a>
+		</div>
+	}
 </div>

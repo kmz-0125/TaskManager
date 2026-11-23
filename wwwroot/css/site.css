@@ -29,3 +29,13 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* テーブル行の高さを整数ピクセルで固定し、拡大率125%/150%環境でのガタつきを防ぐ */
+.table > tbody > tr {
+    height: 48px;
+}
+
+    .table > tbody > tr > td {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }

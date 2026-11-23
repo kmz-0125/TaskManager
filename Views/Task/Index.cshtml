@@ -44,10 +44,10 @@ else
 						@if (task.Status != TaskManager.Models.TaskStatus.Completed)
 						{
 							<form asp-action="ChangeStatus" asp-route-id="@task.Id" method="post" class="d-inline">
-								<button type="submit" class="btn btn-sm btn-danger">ステータス変更</button>
+								<button type="submit" class="btn btn-sm btn-warning">ステータス変更</button>
 							</form>
 						}
-						<a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-secondary">詳細</a>
+						<a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-primary">詳細</a>
 					</td>
 				</tr>
 			}
