@@ -23,13 +23,13 @@
 				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 					<ul class="navbar-nav flex-grow-1">
 						<li class="nav-item">
-							<a class="nav-link " asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+							<a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
 						</li>
 
 						@if (User.Identity != null && User.Identity.IsAuthenticated)
 						{
 							<li class="nav-item">
-								<a class="nav-link " asp-area="" asp-controller="Project" asp-action="Index">Project</a>
+								<a class="nav-link text-light" asp-area="" asp-controller="Project" asp-action="Index">Project</a>
 							</li>
 						}
 					</ul>
@@ -42,22 +42,22 @@
 						@if (User.Identity != null && User.Identity.IsAuthenticated)// ログイン時にSignInAsyncで渡したClaimsPrincipalが、以降のリクエストのたびにUserプロパティとして自動的に取り出せる
 						{
 							<li class="nav-item">
-								<span class="navbar-text me-3">@((await UserManager.GetUserAsync(User))?.Name) さん</span>
+								<span class="navbar-text me-3 text-light">@((await UserManager.GetUserAsync(User))?.Name) さん</span>
 							</li>
 
 							<li class="nav-item">
 								<form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-									<button type="submit" class="nav-link btn btn-link " style="border:none;">ログアウト</button>
+									<button type="submit" class="nav-link btn btn-link text-light" style="border:none;">ログアウト</button>
 								</form>
 							</li>
 						}
 						else
 						{
 							<li class="nav-item">
-								<a class="nav-link" asp-controller="Account" asp-action="Login">ログイン</a>
+								<a class="nav-link text-light" asp-controller="Account" asp-action="Login">ログイン</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" asp-controller="Account" asp-action="Register">新規登録</a>
+								<a class="nav-link text-light" asp-controller="Account" asp-action="Register">新規登録</a>
 							</li>
 						}
 					</ul>
@@ -73,7 +73,7 @@
 
 	<footer class="border-top footer text-muted">
 		<div class="container">
-			&copy; 2026 - TaskManager - 
+			&copy; 2026 - TaskManager
 		</div>
 	</footer>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
